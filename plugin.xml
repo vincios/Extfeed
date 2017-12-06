@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+    <name>ExtFeed</name>
+    <key>extfeed</key>
+    <description>An APIs collection to grab newsfeed data</description>
+    <author>!!MISSING!!</author>
+    <authorEmail>!!MISSING!!</authorEmail>
+    <authorUrl>!!MISSING!!</authorUrl>
+    <developerKey>!!MISSING!!</developerKey>
+    <build>1</build>
+    <copyright>(!!MISSING!!</copyright>
+    <license>!!MISSING!!</license>
+    <licenseUrl>!!MISSING!!</licenseUrl>
+</plugin>
+<!-- TODO: (vincenzo) completare i dati mancanti  -->
