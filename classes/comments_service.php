@@ -236,8 +236,7 @@ class EXTFEED_CLASS_CommentsService
         {
             $contextActionMenu[] = array(
                 'label' => OW::getLanguage()->text('base', 'contex_action_comment_delete_label'),
-                'actionType' => 'delete',
-                'actionUrl' => OW::getRouter()->urlFor("EXTFEED_CTRL_Api", "deleteComment"),
+                'actionType' => 'delete_comment',
                 'params' => array(
                     'commentId' => $comment->getId(),
                     'etype' => $action->entityType,
@@ -251,20 +250,11 @@ class EXTFEED_CLASS_CommentsService
         {
             $contextActionMenu[] = array(
                 'label' => OW::getLanguage()->text('base', 'flag'),
-                'actionType' => 'flag',
-                'actionUrl' => OW::getRouter()->urlFor("EXTFEED_CTRL_Api", "flagContent"),
+                'actionType' => 'flag_content',
                 'params' => array(
                     'etype' => 'comment',
                     'eid' => $comment->id,
                     'reason' => null
-                ),
-                'paramOptions' => array(
-                    'target' => 'reason',
-                    'options' => array(
-                        'spam' => OW::getLanguage()->text('base', 'flag_spam'),
-                        'offence' => OW::getLanguage()->text('base', 'flag_offence'),
-                        'illegal' => OW::getLanguage()->text('base', 'flag_illegal')
-                    )
                 )
             );
         }

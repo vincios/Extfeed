@@ -404,20 +404,11 @@ abstract class EXTFEED_CLASS_PostExtractor
             {
                 $out['contextActionMenu'][] = array(
                     'label' => $menuEntry['label'],
-                    'actionType' => 'flag',
-                    'actionUrl' => OW::getRouter()->urlFor("EXTFEED_CTRL_Api", "flagContent"),
+                    'actionType' => 'flag_content',
                     'params' => array(
                         'etype' => $menuEntry['attributes']['data-etype'],
                         'eid' => $menuEntry['attributes']['data-eid'],
                         'reason' => null
-                    ),
-                    'paramOptions' => array(
-                        'target' => 'reason',
-                        'options' => array(
-                            'spam' => OW::getLanguage()->text('base', 'flag_spam'),
-                            'offence' => OW::getLanguage()->text('base', 'flag_offence'),
-                            'illegal' => OW::getLanguage()->text('base', 'flag_illegal')
-                        )
                     )
                 );
             }
@@ -425,8 +416,7 @@ abstract class EXTFEED_CLASS_PostExtractor
             {
                 $out['contextActionMenu'][] = array(
                     'label' => $menuEntry['label'],
-                    'actionType' => 'delete',
-                    'actionUrl' => OW::getRouter()->urlFor("EXTFEED_CTRL_Api", "deletePost"),
+                    'actionType' => 'delete_post',
                     'params' => array(
                         'actionId' => $out['id']
                     )
