@@ -1,11 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: vinnun
- * Date: 25/10/2017
- * Time: 16:42
- */
-OW::getAutoloader()->addPackagePointer("EXTFEED_EXTRACTOR", OW_DIR_PLUGIN."extfeed".DS."extractors".DS);
+
+OW::getAutoloader()->addPackagePointer("EXTFEED_EXTRACTOR", OW_DIR_PLUGIN . "extfeed" . DS . "extractors" . DS);
 
 EXTFEED_CLASS_ExtractorsManager::getInstance()->addExtractor("", "EXTFEED_EXTRACTOR_Empty");
 EXTFEED_CLASS_ExtractorsManager::getInstance()->addExtractor("text","EXTFEED_EXTRACTOR_Text");

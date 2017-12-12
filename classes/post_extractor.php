@@ -104,8 +104,6 @@ abstract class EXTFEED_CLASS_PostExtractor
             }
         }
 
-        //$lastActivity = $this->findLastNoSystemActivity($activitiesArray);  //we cannot use the action's getLastActivity() method because sometime this method returns a "system activity" (create o subscribe) even if there is another suitable activity (like 'comment' or 'like') on the action
-
         if ( $lastActivity != null )
         {
 
@@ -158,7 +156,7 @@ abstract class EXTFEED_CLASS_PostExtractor
         $out['features'] = $this->extendFeatures($out, $extraInfo);
         $out['content'] = $this->extractContent($out);
 
-        //Operations to trigger feed.on_item_render event. This event add some information like contextMenu buttons
+        //Operations for triggering feed.on_item_render event. This event add some information like contextMenu buttons
         $feedList = array();
         $sameFeed = false;
 
@@ -221,7 +219,6 @@ abstract class EXTFEED_CLASS_PostExtractor
 
     private function decodeString($encodedString)
     {
-
         if( !is_array($encodedString) )
         {
             return $encodedString;
@@ -243,7 +240,6 @@ abstract class EXTFEED_CLASS_PostExtractor
 
     protected function decodeRoutingInfo($routeParams)
     {
-
         if ( !isset($routeParams) )
         {
             return;
@@ -371,7 +367,7 @@ abstract class EXTFEED_CLASS_PostExtractor
         $out['context'] = $context;
 
 
-        //TODO: (vincenzo) add context id
+        //TODO: add context id
         /*if( $context !== null && isset($context['url']) )
         {
             $url = $context['url'];

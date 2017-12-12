@@ -167,6 +167,8 @@ class EXTFEED_CLASS_NewsfeedService
         }
 
         $content = array();
+        $attachmentId = null;
+
         if($attachment !== null)
         {
             $type = explode("/", $attachment['type']);
@@ -178,7 +180,9 @@ class EXTFEED_CLASS_NewsfeedService
                     $attach = BOL_AttachmentService::getInstance()->processPhotoAttachment("extfeed", $attachment);
 
                     $content['type'] = "photo";
-                    $content['url'] = $attach['url'];
+                    $content['url'] = $content['href'] = $attach['url'];
+                    $content['pluginKey'] = $attach['dto']->pluginKey;
+                    $attachmentId = $attach['uid'];
                 }
                 catch (InvalidArgumentException $e)
                 {
@@ -229,7 +233,11 @@ class EXTFEED_CLASS_NewsfeedService
 
         //if nobody catch the event we have to create the new feed item
         $status = UTIL_HtmlTag::autoLink($status);
-        $item = $this->bolService->addStatus($userId, $feedType, $feedId, $visibility, $status);
+        $item = $this->bolService->addStatus($userId, $feedType, $feedId, $visibility, $status,
+            array(
+                'content' => $content,
+                'attachmentId' => $attachmentId
+            ));
 
         return $this->getFeedItem(
             array('feedType' => $feedType, 'feedId' => $feedId),
@@ -247,7 +255,7 @@ class EXTFEED_CLASS_NewsfeedService
         {
             return array(
                 EXTFEED_CTRL_Api::JSON_RESULT_FIELD => false,
-                EXTFEED_CTRL_Api::JSON_MESSAGE_FIELD => "Action not found"
+                EXTFEED_CTRL_Api::JSON_MESSAGE_FIELD => "Item not found"
             );
         }
 
@@ -288,7 +296,7 @@ class EXTFEED_CLASS_NewsfeedService
         {
             return array(
                 EXTFEED_CTRL_Api::JSON_RESULT_FIELD => false,
-                EXTFEED_CTRL_Api::JSON_MESSAGE_FIELD => "Post not found"
+                EXTFEED_CTRL_Api::JSON_MESSAGE_FIELD => "Item not found"
             );
         }
 
@@ -320,7 +328,7 @@ class EXTFEED_CLASS_NewsfeedService
         {
             return array(
                 EXTFEED_CTRL_Api::JSON_RESULT_FIELD => false,
-                EXTFEED_CTRL_Api::JSON_MESSAGE_FIELD => "User not allowed"
+                EXTFEED_CTRL_Api::JSON_MESSAGE_FIELD => EXTFEED_CTRL_Api::JSON_MESSAGE_USER_UNAUTHORIZED
             );
         }
     }

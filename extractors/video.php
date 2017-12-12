@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: vinnun
- * Date: 26/10/2017
- * Time: 09:37
- */
 
 class EXTFEED_EXTRACTOR_Video extends EXTFEED_CLASS_PostExtractor
 {

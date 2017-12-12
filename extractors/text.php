@@ -1,4 +1,5 @@
 <?php
+
 class EXTFEED_EXTRACTOR_Text extends EXTFEED_CLASS_PostExtractor
 {
 

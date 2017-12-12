@@ -1,4 +1,5 @@
 <?php
+
 class EXTFEED_CLASS_EventHandler
 {
     /**

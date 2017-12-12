@@ -1,4 +1,5 @@
 <?php
+
 class EXTFEED_CLASS_PhotoService
 {
     private static $classInstance;
@@ -26,13 +27,22 @@ class EXTFEED_CLASS_PhotoService
 
     public function getPhotoInfo($photoIdList)
     {
-        if (!is_array($photoIdList) )
+        if ( !is_array($photoIdList) )
         {
             return array(
                 EXTFEED_CTRL_Api::JSON_RESULT_FIELD=>false,
                 EXTFEED_CTRL_Api::JSON_MESSAGE_FIELD=>"Param ids must be an array"
             );
         }
+
+        if ( !OW::getPluginManager()->isPluginActive("photo") )
+        {
+            return array(
+                EXTFEED_CTRL_Api::JSON_RESULT_FIELD=>false,
+                EXTFEED_CTRL_Api::JSON_MESSAGE_FIELD=>"Plugin photo not active"
+            );
+        }
+
         $photoService = PHOTO_BOL_PhotoService::getInstance();
 
         $photos = $photoService->findPhotoListByIdList($photoIdList, 1, count($photoIdList));

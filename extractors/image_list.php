@@ -1,4 +1,5 @@
 <?php
+
 class EXTFEED_EXTRACTOR_ImageList extends EXTFEED_CLASS_PostExtractor
 {
 
@@ -16,16 +17,15 @@ class EXTFEED_EXTRACTOR_ImageList extends EXTFEED_CLASS_PostExtractor
         $photoList = $photoService->findPhotoListByIdList($photoIds, 1, 5);
         $photoOutList = array();
 
-        foreach ($photoList as $photo){
+        foreach ( $photoList as $photo )
+        {
             $photoDimension = json_decode($photo['dimension'], true);
 
-            //$photoUrl = $photo['url'];
             $photoPreviewUrl = $photo['url'];
             $photoOutList[] = array(
                 'photoId'=>$photo['id'],
                 'photoTitle'=>$photo['description'],
                 'photoPreviewDimensions'=>$photoDimension[PHOTO_BOL_PhotoService::TYPE_PREVIEW],
-                //'photoUrl'=>$photoUrl,
                 'photoPreviewUrl'=>$photoPreviewUrl
             );
         }

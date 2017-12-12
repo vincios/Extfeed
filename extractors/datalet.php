@@ -1,4 +1,5 @@
 <?php
+
 class EXTFEED_EXTRACTOR_Datalet extends EXTFEED_CLASS_PostExtractor
 {
 

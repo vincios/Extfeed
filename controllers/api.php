@@ -1,7 +1,7 @@
 <?php
+
 class EXTFEED_CTRL_Api extends OW_ActionController
 {
-
 
     /**@var EXTFEED_CLASS_NewsfeedService */
     protected $newsfeedService;
@@ -69,11 +69,6 @@ class EXTFEED_CTRL_Api extends OW_ActionController
 
         $auth = $this->newsfeedService->viewerAuthorized($feedType, $feedId);
 
-
-        if( OW::getUser()->isAuthenticated() ) {
-            $auth["login"]= "userId=".OW::getUser()->getId(); //TODO:(vincenzo) remove this
-        }
-
         echo json_encode($auth);
         exit();
     }
@@ -128,7 +123,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
     public function getItem()
     {
         $this->setHeaders();
-        if( !$this->paramsExists(array('ftype', 'fid', 'etype', 'eid')) )
+        if( !$this->paramsExists(array('ft', 'fi', 'etype', 'eid')) )
         {
             echo $this->messageError(self::JSON_MESSAGE_MISSING_PARAMETER);
             exit();
@@ -141,8 +136,8 @@ class EXTFEED_CTRL_Api extends OW_ActionController
         }
 
         $feedParams = array(
-            'feedType' => $_REQUEST['ftype'],
-            'feedId' => $_REQUEST['fid']
+            'feedType' => $_REQUEST['ft'],
+            'feedId' => $_REQUEST['fi']
         );
 
         $itemParams = array(
@@ -160,7 +155,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
     public function addLike()
     {
         $this->setHeaders();
-        if( !$this->paramsExists(array('entityType', 'entityId')) )
+        if( !$this->paramsExists(array('etype', 'eid')) )
         {
             echo $this->messageError(self::JSON_MESSAGE_MISSING_PARAMETER);
             exit;
@@ -172,8 +167,8 @@ class EXTFEED_CTRL_Api extends OW_ActionController
             exit();
         }
 
-        $entityType = $_REQUEST['entityType'];
-        $entityId = $_REQUEST['entityId'];
+        $entityType = $_REQUEST['etype'];
+        $entityId = $_REQUEST['eid'];
         $userId = isset($_REQUEST['userId']) ? $_REQUEST['userId'] : OW::getUser()->getId();
 
         $out = $this->newsfeedService->like($entityType, $entityId, $userId);
@@ -186,7 +181,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
     public function removeLike()
     {
         $this->setHeaders();
-        if( !$this->paramsExists(array('entityType', 'entityId')) )
+        if( !$this->paramsExists(array('etype', 'eid')) )
         {
             echo $this->messageError(self::JSON_MESSAGE_MISSING_PARAMETER);
             exit;
@@ -198,8 +193,8 @@ class EXTFEED_CTRL_Api extends OW_ActionController
             exit();
         }
 
-        $entityType = $_REQUEST['entityType'];
-        $entityId = $_REQUEST['entityId'];
+        $entityType = $_REQUEST['etype'];
+        $entityId = $_REQUEST['eid'];
         $userId = isset($_REQUEST['userId']) ? $_REQUEST['userId'] : OW::getUser()->getId();
 
         $out = $this->newsfeedService->unlike($entityType, $entityId, $userId);
