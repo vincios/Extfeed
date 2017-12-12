@@ -32,6 +32,10 @@ class EXTFEED_EXTRACTOR_Image extends EXTFEED_CLASS_PostExtractor
             $imageUrl = $dataContent['vars']['image'];
             $status = $this->findStatus($data);
             list($width, $height) = getimagesize($imageUrl);
+
+            $width = isset($width) ? $width : 0;
+            $height = isset($height) ? $height : 0;
+
             $outContent = array(
                 'status' => $status,
                 'photoId' => $data['dataExtras']['attachmentId'],
