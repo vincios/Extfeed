@@ -30,6 +30,28 @@ class EXTFEED_CLASS_CommentsService
         return self::$classInstance;
     }
 
+
+    public function getUserId()
+    {
+        $user_id = null;
+        if (!OW::getUser()->isAuthenticated())
+        {
+            try
+            {
+                $user_id = ODE_CLASS_Tools::getInstance()->getUserFromJWT($_REQUEST['jwt']);
+            }
+            catch (Exception $e)
+            {
+                echo json_encode(array("status"  => "ko", "error_message" => $e->getMessage()));
+                exit;
+            }
+        }else{
+            $user_id = OW::getUser()->getId();
+        }
+
+        return $user_id;
+    }
+
     /**
      * Get comments related to the feed item identified by $entityType and $entityId, according tho the pagination limits
      * If $page and $count are null then get all comments
@@ -153,7 +175,7 @@ class EXTFEED_CLASS_CommentsService
 
         $isModerator = OW::getUser()->isAuthorized($entityParams['pluginKey']);
         $isOwnerAuthorized = (OW::getUser()->isAuthenticated() && $entityParams['ownerId'] !== null && (int) $entityParams['ownerId'] === (int) OW::getUser()->getId());
-        $commentOwner = ( (int) OW::getUser()->getId() === (int) $comment->getUserId() );
+        $commentOwner = ( (int) $this->getUserId() === (int) $comment->getUserId() );
 
         if ( !$isModerator && !$isOwnerAuthorized && !$commentOwner )
         {
@@ -214,7 +236,7 @@ class EXTFEED_CLASS_CommentsService
 
 
         $isModerator = OW::getUser()->isAuthorized($action->pluginKey);
-        $commentOwner = ( (int) OW::getUser()->getId() === (int) $comment->getUserId() );
+        $commentOwner = ( (int) $this->getUserId() === (int) $comment->getUserId() );
         $isOwnerAuthorized = false;
 
         /** @var NEWSFEED_BOL_Activity $cActivity */
@@ -230,7 +252,7 @@ class EXTFEED_CLASS_CommentsService
         $contextActionMenu = array();
 
         $canDelete = $isModerator || $commentOwner || $isOwnerAuthorized;
-        $canFlag = OW::getUser()->getId() != $comment->getUserId();
+        $canFlag = $this->getUserId() != $comment->getUserId();
 
         if ( $canDelete )
         {

@@ -341,7 +341,7 @@ abstract class EXTFEED_CLASS_PostExtractor
             /**@var NEWSFEED_BOL_Like $like*/
             foreach ($likes as $like)
             {
-                if( $like->userId == OW::getUser()->getId() )
+                if( $like->userId == EXTFEED_CLASS_NewsfeedService::getInstance()->getUserId() )
                 {
                     $selfLike = true;
                     break;

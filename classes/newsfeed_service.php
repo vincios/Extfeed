@@ -30,7 +30,26 @@ class EXTFEED_CLASS_NewsfeedService
         return self::$classInstance;
     }
 
+    public function getUserId()
+    {
+        $user_id = null;
+        if (!OW::getUser()->isAuthenticated())
+        {
+            try
+            {
+                $user_id = ODE_CLASS_Tools::getInstance()->getUserFromJWT($_REQUEST['jwt']);
+            }
+            catch (Exception $e)
+            {
+                echo json_encode(array("status"  => "ko", "error_message" => $e->getMessage()));
+                exit;
+            }
+        }else{
+            $user_id = OW::getUser()->getId();
+        }
 
+        return $user_id;
+    }
 
     /**
      * Return an array that contain all the actions that respects the parameters in $params
@@ -309,7 +328,7 @@ class EXTFEED_CLASS_NewsfeedService
             /**@var $activity NEWSFEED_BOL_Activity */
             foreach ( $createActivities as $activity)
             {
-                if( $activity->userId == OW::getUser()->getId() )
+                if( $activity->userId == $this->getUserId() )
                 {
                     $allowed = true;
                     break;
@@ -479,7 +498,7 @@ class EXTFEED_CLASS_NewsfeedService
                         $auth['view']['message'] = isset($data['message']) ? $data['message'] : "No permissions";
                     }
                 }
-                $isBlocked = BOL_UserService::getInstance()->isBlocked(OW::getUser()->getId(), $userId);
+                $isBlocked = BOL_UserService::getInstance()->isBlocked($this->getUserId(), $userId);
 
                 if( OW::getUser()->isAuthorized('base', 'add_comment') )
                 {

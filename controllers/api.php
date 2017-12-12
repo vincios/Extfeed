@@ -30,9 +30,30 @@ class EXTFEED_CTRL_Api extends OW_ActionController
         header('Content-Type:application/json');
     }
 
+    public function getUserId()
+    {
+        $user_id = null;
+        if (!OW::getUser()->isAuthenticated())
+        {
+            try
+            {
+                $user_id = ODE_CLASS_Tools::getInstance()->getUserFromJWT($_REQUEST['jwt']);
+            }
+            catch (Exception $e)
+            {
+                echo json_encode(array("status"  => "ko", "error_message" => $e->getMessage()));
+                exit;
+            }
+        }else{
+            $user_id = OW::getUser()->getId();
+        }
+
+        return $user_id;
+    }
 
     private function isAuthenticated()
     {
+        $userId = $this->getUserId();
         return OW::getUser()->isAuthenticated();
     }
 
@@ -88,7 +109,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
             exit();
         }
 
-        $userId = OW::getUser()->getId();
+        $userId = $this->getUserId();
         //$userId = 1;
 
         $feedType = $_REQUEST['ft'];
@@ -195,7 +216,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
 
         $entityType = $_REQUEST['etype'];
         $entityId = $_REQUEST['eid'];
-        $userId = isset($_REQUEST['userId']) ? $_REQUEST['userId'] : OW::getUser()->getId();
+        $userId = isset($_REQUEST['userId']) ? $_REQUEST['userId'] : $this->getUserId();
 
         $out = $this->newsfeedService->unlike($entityType, $entityId, $userId);
 
@@ -278,7 +299,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
             exit();
         }
 
-        $userId = OW::getUser()->getId();
+        $userId = $this->getUserId();
         $attachment = null;
         if($_FILES)
         {
