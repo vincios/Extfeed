@@ -7,12 +7,14 @@ class EXTFEED_CLASS_NewsfeedService
     private $bolService;
     private $userService;
     private $avatarService;
+    private $userManager;
 
     public function __construct()
     {
         $this->bolService = NEWSFEED_BOL_Service::getInstance();
         $this->userService = BOL_UserService::getInstance();
         $this->avatarService = BOL_AvatarService::getInstance();
+        $this->userManager = EXTFEED_CLASS_UserManager::getInstance();
     }
 
     /**
@@ -30,26 +32,6 @@ class EXTFEED_CLASS_NewsfeedService
         return self::$classInstance;
     }
 
-    public function getUserId()
-    {
-        $user_id = null;
-        if (!OW::getUser()->isAuthenticated())
-        {
-            try
-            {
-                $user_id = ODE_CLASS_Tools::getInstance()->getUserFromJWT($_REQUEST['jwt']);
-            }
-            catch (Exception $e)
-            {
-                echo json_encode(array("status"  => "ko", "error_message" => $e->getMessage()));
-                exit;
-            }
-        }else{
-            $user_id = OW::getUser()->getId();
-        }
-
-        return $user_id;
-    }
 
     /**
      * Return an array that contain all the actions that respects the parameters in $params
@@ -319,7 +301,7 @@ class EXTFEED_CLASS_NewsfeedService
             );
         }
 
-        $allowed = OW::getUser()->isAuthorized("newsfeed"); //check if user is a moderator
+        $allowed = $this->userManager->isAuthorized("newsfeed"); //check if user is a moderator
 
         if( !$allowed ) //if not, check if user have created this action
         {
@@ -328,7 +310,7 @@ class EXTFEED_CLASS_NewsfeedService
             /**@var $activity NEWSFEED_BOL_Activity */
             foreach ( $createActivities as $activity)
             {
-                if( $activity->userId == $this->getUserId() )
+                if( $activity->userId == $this->userManager->getUserId() )
                 {
                     $allowed = true;
                     break;
@@ -473,13 +455,13 @@ class EXTFEED_CLASS_NewsfeedService
             )
         );
 
-        $viewerId = OW::getUser()->getId();
+        $viewerId = $this->userManager->getUserId();
         switch ( $feedType )
         {
             case "user":
                 $userId = $feedId;
                 $ownerMode = $userId == $viewerId;
-                $modPermissions = OW::getUser()->isAuthorized( 'newsfeed' );
+                $modPermissions = $this->userManager->isAuthorized( 'newsfeed' );
 
                 if( !$ownerMode && !$modPermissions )
                 {
@@ -498,9 +480,9 @@ class EXTFEED_CLASS_NewsfeedService
                         $auth['view']['message'] = isset($data['message']) ? $data['message'] : "No permissions";
                     }
                 }
-                $isBlocked = BOL_UserService::getInstance()->isBlocked($this->getUserId(), $userId);
+                $isBlocked = BOL_UserService::getInstance()->isBlocked($this->userManager->getUserId(), $userId);
 
-                if( OW::getUser()->isAuthorized('base', 'add_comment') )
+                if( $this->userManager->isAuthorized('base', 'add_comment') )
                 {
                     if( $isBlocked )
                     {
@@ -511,7 +493,7 @@ class EXTFEED_CLASS_NewsfeedService
                 {
                     $auth['write']['result'] = false;
                     $auth['write']['message'] = "Not authorized";
-                    $actionStatus = BOL_AuthorizationService::getInstance()->getActionStatus('base', 'add_comment');
+                    $actionStatus = BOL_AuthorizationService::getInstance()->getActionStatus('base', 'add_comment', array('userId', $this->userManager->getUserId()));
 
                     if( $actionStatus["status"] == BOL_AuthorizationService::STATUS_PROMOTED )
                     {
@@ -529,7 +511,7 @@ class EXTFEED_CLASS_NewsfeedService
                     break;
                 }
 
-                if ( !OW::getUser()->isAuthorized('newsfeed', 'allow_status_update') )
+                if ( !$this->userManager->isAuthorized('newsfeed', 'allow_status_update') )
                 {
                     $auth['write']['result'] = false;
                     $auth['write']['message'] = "You are not authorized to write";
@@ -538,7 +520,7 @@ class EXTFEED_CLASS_NewsfeedService
             case "site":
                 $enabled = OW::getConfig()->getValue('newsfeed', 'index_status_enabled');
 
-                if ( !$enabled || !OW::getUser()->isAuthenticated() || !OW::getUser()->isAuthorized('newsfeed', 'allow_status_update') )
+                if ( !$enabled || !$this->userManager->isAuthenticated() || !$this->userManager->isAuthorized('newsfeed', 'allow_status_update') )
                 {
                     $auth['write']['result'] = false;
                     $auth['write']['message'] = "You are not authorized to write";

@@ -7,18 +7,20 @@ class EXTFEED_CLASS_CommentsService
     private $bolService;
     private $userService;
     private $avatarService;
+    private $userManager;
 
     public function __construct()
     {
         $this->bolService = NEWSFEED_BOL_Service::getInstance();
         $this->userService = BOL_UserService::getInstance();
         $this->avatarService = BOL_AvatarService::getInstance();
+        $this->userManager = EXTFEED_CLASS_UserManager::getInstance();
     }
 
     /**
      * Returns class instance
      *
-     * @return EXTFEED_CLASS_CommentsService
+     * @return EXTFEED_CLASS_UserManager
      */
     public static function getInstance()
     {
@@ -28,28 +30,6 @@ class EXTFEED_CLASS_CommentsService
         }
 
         return self::$classInstance;
-    }
-
-
-    public function getUserId()
-    {
-        $user_id = null;
-        if (!OW::getUser()->isAuthenticated())
-        {
-            try
-            {
-                $user_id = ODE_CLASS_Tools::getInstance()->getUserFromJWT($_REQUEST['jwt']);
-            }
-            catch (Exception $e)
-            {
-                echo json_encode(array("status"  => "ko", "error_message" => $e->getMessage()));
-                exit;
-            }
-        }else{
-            $user_id = OW::getUser()->getId();
-        }
-
-        return $user_id;
     }
 
     /**
@@ -151,6 +131,7 @@ class EXTFEED_CLASS_CommentsService
     public function deleteComment( $commentId, $entityParams )
     {
         $commentService = BOL_CommentService::getInstance();
+
         /* @var $comment BOL_Comment */
         $comment = $commentService->findComment($commentId);
 
@@ -173,9 +154,10 @@ class EXTFEED_CLASS_CommentsService
             );
         }
 
-        $isModerator = OW::getUser()->isAuthorized($entityParams['pluginKey']);
-        $isOwnerAuthorized = (OW::getUser()->isAuthenticated() && $entityParams['ownerId'] !== null && (int) $entityParams['ownerId'] === (int) OW::getUser()->getId());
-        $commentOwner = ( (int) $this->getUserId() === (int) $comment->getUserId() );
+        $isModerator = $this->userManager->isAuthorized($entityParams['pluginKey']);
+
+        $isOwnerAuthorized = ($this->userManager->isAuthenticated() && $entityParams['ownerId'] !== null && (int) $entityParams['ownerId'] === (int) $this->userManager->getUserId());
+        $commentOwner = ( (int) $this->userManager->getUserId() === (int) $this->userManager->getUserId() );
 
         if ( !$isModerator && !$isOwnerAuthorized && !$commentOwner )
         {
@@ -235,14 +217,14 @@ class EXTFEED_CLASS_CommentsService
         }
 
 
-        $isModerator = OW::getUser()->isAuthorized($action->pluginKey);
-        $commentOwner = ( (int) $this->getUserId() === (int) $comment->getUserId() );
+        $isModerator = $this->userManager->isAuthorized($action->pluginKey);
+        $commentOwner = ( (int) $this->userManager->getUserId() === (int) $comment->getUserId() );
         $isOwnerAuthorized = false;
 
         /** @var NEWSFEED_BOL_Activity $cActivity */
         foreach ( $createActivities as $cActivity )
         {
-            if( OW::getUser()->isAuthenticated() && $cActivity->userId !== null && (int) $cActivity->userId === (int) OW::getUser()->getId() )
+            if( $this->userManager->isAuthenticated() && $cActivity->userId !== null && (int) $cActivity->userId === (int) $this->userManager->getUserId() )
             {
                 $isOwnerAuthorized = true;
                 break;
@@ -252,7 +234,7 @@ class EXTFEED_CLASS_CommentsService
         $contextActionMenu = array();
 
         $canDelete = $isModerator || $commentOwner || $isOwnerAuthorized;
-        $canFlag = $this->getUserId() != $comment->getUserId();
+        $canFlag = $this->userManager->getUserId() != $comment->getUserId();
 
         if ( $canDelete )
         {

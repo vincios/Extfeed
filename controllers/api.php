@@ -6,11 +6,13 @@ class EXTFEED_CTRL_Api extends OW_ActionController
     /**@var EXTFEED_CLASS_NewsfeedService */
     protected $newsfeedService;
 
-    /** @var EXTFEED_CLASS_CommentsService */
+    /** @var EXTFEED_CLASS_UserManager */
     protected $commentsService;
 
     /** @var EXTFEED_CLASS_PhotoService */
     protected $photoService;
+
+    protected $userManager;
 
     const JSON_RESULT_FIELD = "result";
     const JSON_MESSAGE_FIELD = "message";
@@ -21,8 +23,9 @@ class EXTFEED_CTRL_Api extends OW_ActionController
     public function __construct()
     {
         $this->newsfeedService = EXTFEED_CLASS_NewsfeedService::getInstance();
-        $this->commentsService = EXTFEED_CLASS_CommentsService::getInstance();
+        $this->commentsService = EXTFEED_CLASS_UserManager::getInstance();
         $this->photoService = EXTFEED_CLASS_PhotoService::getInstance();
+        $this->userManager = EXTFEED_CLASS_UserManager::getInstance();
     }
 
     private function setHeaders()
@@ -30,31 +33,10 @@ class EXTFEED_CTRL_Api extends OW_ActionController
         header('Content-Type:application/json');
     }
 
-    public function getUserId()
-    {
-        $user_id = null;
-        if (!OW::getUser()->isAuthenticated())
-        {
-            try
-            {
-                $user_id = ODE_CLASS_Tools::getInstance()->getUserFromJWT($_REQUEST['jwt']);
-            }
-            catch (Exception $e)
-            {
-                echo json_encode(array("status"  => "ko", "error_message" => $e->getMessage()));
-                exit;
-            }
-        }else{
-            $user_id = OW::getUser()->getId();
-        }
-
-        return $user_id;
-    }
 
     private function isAuthenticated()
     {
-        $userId = $this->getUserId();
-        return OW::getUser()->isAuthenticated();
+       return $this->userManager->isAuthenticated();
     }
 
     private function messageError( $message )
@@ -109,8 +91,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
             exit();
         }
 
-        $userId = $this->getUserId();
-        //$userId = 1;
+        $userId = $this->userManager->getUserId();
 
         $feedType = $_REQUEST['ft'];
         $feedId = (int)$_REQUEST['fi'];
@@ -190,10 +171,9 @@ class EXTFEED_CTRL_Api extends OW_ActionController
 
         $entityType = $_REQUEST['etype'];
         $entityId = $_REQUEST['eid'];
-        $userId = isset($_REQUEST['userId']) ? $_REQUEST['userId'] : OW::getUser()->getId();
+        $userId = isset($_REQUEST['userId']) ? $_REQUEST['userId'] : $this->userManager->getUserId();
 
         $out = $this->newsfeedService->like($entityType, $entityId, $userId);
-
 
         echo json_encode($out);
         exit();
@@ -216,7 +196,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
 
         $entityType = $_REQUEST['etype'];
         $entityId = $_REQUEST['eid'];
-        $userId = isset($_REQUEST['userId']) ? $_REQUEST['userId'] : $this->getUserId();
+        $userId = isset($_REQUEST['userId']) ? $_REQUEST['userId'] : $this->userManager->getUserId();
 
         $out = $this->newsfeedService->unlike($entityType, $entityId, $userId);
 
@@ -245,7 +225,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
             $attachment = $_FILES['attachment'];
         }
 
-        $userId = OW::getUser()->getId();
+        $userId = $this->userManager->getUserId();
         $feedType = $_REQUEST['ftype'];
         $feedId = $_REQUEST['fid'];
         $message = $_REQUEST['message'];
@@ -293,13 +273,13 @@ class EXTFEED_CTRL_Api extends OW_ActionController
             exit();
         }
 
-        if( !OW::getUser()->isAuthorized($_REQUEST['pkey'], 'add_comment') )
+        if( !$this->userManager->isAuthorized($_REQUEST['pkey'], 'add_comment') )
         {
             echo $this->messageError("User not authorized");
             exit();
         }
 
-        $userId = $this->getUserId();
+        $userId = $this->userManager->getUserId();
         $attachment = null;
         if($_FILES)
         {
@@ -388,7 +368,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
 
         $entityType = $_REQUEST['etype'];
         $entityId = $_REQUEST['eid'];
-        $userId = isset($_REQUEST['userId']) ? $_REQUEST['userId'] : OW::getUser()->getId();
+        $userId = isset($_REQUEST['userId']) ? $_REQUEST['userId'] : $this->userManager->getUserId();
         $reason = $_REQUEST['reason'];
 
         if( !in_array($reason, array('spam', 'offence', 'illegal')) )

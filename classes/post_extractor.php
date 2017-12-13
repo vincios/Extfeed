@@ -310,7 +310,7 @@ abstract class EXTFEED_CLASS_PostExtractor
                 $authGroup = "newsfeed"; //...if not we use the generic authorization rules for the plugin 'newsfeed'
             }
 
-            $isAllowed = OW::getUser()->isAuthorized($authGroup, "add_comment");
+            $isAllowed = EXTFEED_CLASS_UserManager::getInstance()->isAuthorized($authGroup, "add_comment");
             $count = BOL_CommentService::getInstance()->findCommentCount($entityType, $entityId);
 
             $featuresOut['comments'] = array(
@@ -341,14 +341,14 @@ abstract class EXTFEED_CLASS_PostExtractor
             /**@var NEWSFEED_BOL_Like $like*/
             foreach ($likes as $like)
             {
-                if( $like->userId == EXTFEED_CLASS_NewsfeedService::getInstance()->getUserId() )
+                if( $like->userId == EXTFEED_CLASS_UserManager::getInstance()->getUserId() )
                 {
                     $selfLike = true;
                     break;
                 }
             }
 
-            $isAllowed = OW::getUser()->isAuthenticated();
+            $isAllowed = EXTFEED_CLASS_UserManager::getInstance()->isAuthenticated();
 
             $featuresOut['likes'] = array(
                 'count'=>count($likes),
