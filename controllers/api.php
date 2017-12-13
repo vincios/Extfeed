@@ -23,7 +23,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
     public function __construct()
     {
         $this->newsfeedService = EXTFEED_CLASS_NewsfeedService::getInstance();
-        $this->commentsService = EXTFEED_CLASS_UserManager::getInstance();
+        $this->commentsService = EXTFEED_CLASS_CommentsService::getInstance();
         $this->photoService = EXTFEED_CLASS_PhotoService::getInstance();
         $this->userManager = EXTFEED_CLASS_UserManager::getInstance();
     }
