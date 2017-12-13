@@ -1,6 +1,7 @@
 <?php
 
-OW::getAutoloader()->addPackagePointer("EXTFEED_EXTRACTOR", OW_DIR_PLUGIN . "extfeed" . DS . "extractors" . DS);
+$dir = OW::getPluginManager()->getPlugin("extfeed")->getDirName();
+OW::getAutoloader()->addPackagePointer("EXTFEED_EXTRACTOR", OW_DIR_PLUGIN . $dir . DS . "extractors" . DS);
 
 EXTFEED_CLASS_ExtractorsManager::getInstance()->addExtractor("", "EXTFEED_EXTRACTOR_Empty");
 EXTFEED_CLASS_ExtractorsManager::getInstance()->addExtractor("text","EXTFEED_EXTRACTOR_Text");
