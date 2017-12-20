@@ -23,6 +23,29 @@ class EXTFEED_CLASS_UserManager
         return self::$classInstance;
     }
 
+    public function login()
+    {
+        $userId = $this->getUserId();
+
+        if( $userId == null )
+        {
+            return;
+        }
+
+        if( !OW::getUser()->isAuthenticated() || OW::getUser()->getId() != $userId)
+        {
+            OW::getUser()->login($userId);
+        }
+    }
+
+    public function logout()
+    {
+        if( OW::getUser()->isAuthenticated() )
+        {
+            OW::getUser()->logout();
+        }
+    }
+
     public function getUserId()
     {
         $user_id = null;

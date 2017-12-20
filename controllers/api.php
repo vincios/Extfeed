@@ -6,7 +6,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
     /**@var EXTFEED_CLASS_NewsfeedService */
     protected $newsfeedService;
 
-    /** @var EXTFEED_CLASS_UserManager */
+    /** @var EXTFEED_CLASS_CommentsService */
     protected $commentsService;
 
     /** @var EXTFEED_CLASS_PhotoService */
@@ -60,6 +60,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
             exit;
         }
 
+        $this->userManager->login();
         if( !$this->isAuthenticated() )
         {
             echo $this->messageError(self::JSON_MESSAGE_USER_NOT_AUTHENTICATED);
@@ -73,6 +74,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
         $auth = $this->newsfeedService->viewerAuthorized($feedType, $feedId);
 
         echo json_encode($auth);
+        $this->userManager->logout();
         exit();
     }
 
@@ -85,6 +87,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
             exit;
         }
 
+        $this->userManager->login();
         if( !$this->isAuthenticated() )
         {
             echo $this->messageError(self::JSON_MESSAGE_USER_NOT_AUTHENTICATED);
@@ -119,6 +122,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
 
 
         echo json_encode($out);
+        $this->userManager->logout();
         exit();
     }
 
@@ -131,6 +135,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
             exit();
         }
 
+        $this->userManager->login();
         if( !$this->isAuthenticated() )
         {
             echo $this->messageError(self::JSON_MESSAGE_USER_NOT_AUTHENTICATED);
@@ -150,6 +155,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
         $out = $this->newsfeedService->getFeedItem($feedParams, $itemParams);
 
         echo json_encode($out);
+        $this->userManager->logout();
         exit();
     }
 
@@ -163,6 +169,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
             exit;
         }
 
+        $this->userManager->login();
         if( !$this->isAuthenticated() )
         {
             echo $this->messageError(self::JSON_MESSAGE_USER_NOT_AUTHENTICATED);
@@ -175,7 +182,9 @@ class EXTFEED_CTRL_Api extends OW_ActionController
 
         $out = $this->newsfeedService->like($entityType, $entityId, $userId);
 
+
         echo json_encode($out);
+        $this->userManager->logout();
         exit();
     }
 
@@ -188,6 +197,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
             exit;
         }
 
+        $this->userManager->login();
         if( !$this->isAuthenticated() )
         {
             echo $this->messageError(self::JSON_MESSAGE_USER_NOT_AUTHENTICATED);
@@ -201,6 +211,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
         $out = $this->newsfeedService->unlike($entityType, $entityId, $userId);
 
         echo json_encode($out);
+        $this->userManager->logout();
         exit();
     }
 
@@ -213,6 +224,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
             exit();
         }
 
+        $this->userManager->login();
         if( !$this->isAuthenticated() )
         {
             echo $this->messageError(self::JSON_MESSAGE_USER_NOT_AUTHENTICATED);
@@ -224,6 +236,9 @@ class EXTFEED_CTRL_Api extends OW_ActionController
         {
             $attachment = $_FILES['attachment'];
         }
+        if( isset($_REQUEST['attachment']) ) {
+            $attachment = $_REQUEST['attachment'];
+        }
 
         $userId = $this->userManager->getUserId();
         $feedType = $_REQUEST['ftype'];
@@ -234,6 +249,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
         $out = $this->newsfeedService->addStatus($feedType, $feedId, $message, $userId, $visibility, $attachment);
 
         echo json_encode($out);
+        $this->userManager->logout();
         exit();
     }
 
@@ -246,6 +262,13 @@ class EXTFEED_CTRL_Api extends OW_ActionController
             exit;
         }
 
+        $this->userManager->login();
+        if( !$this->isAuthenticated() )
+        {
+            echo $this->messageError(self::JSON_MESSAGE_USER_NOT_AUTHENTICATED);
+            exit();
+        }
+
         $entityType = $_REQUEST['etype'];
         $entityId = $_REQUEST['eid'];
         $page = isset($_REQUEST['page']) ? $_REQUEST['page'] : null;
@@ -254,6 +277,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
         $out = $this->commentsService->getComments($entityType, $entityId, $page, $count);
 
         echo json_encode($out);
+        $this->userManager->logout();
         exit;
     }
 
@@ -267,6 +291,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
             exit();
         }
 
+        $this->userManager->login();
         if( !$this->isAuthenticated() )
         {
             echo $this->messageError(self::JSON_MESSAGE_USER_NOT_AUTHENTICATED);
@@ -300,6 +325,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
         $out = $this->commentsService->addComment($params, $_REQUEST['message'], $userId, $attachment);
 
         echo json_encode($out);
+        $this->userManager->logout();
         exit();
     }
 
@@ -312,6 +338,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
             exit;
         }
 
+        $this->userManager->login();
         if( !$this->isAuthenticated() )
         {
             echo $this->messageError(self::JSON_MESSAGE_USER_NOT_AUTHENTICATED);
@@ -327,6 +354,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
         );
 
         echo json_encode($this->commentsService->deleteComment($commentId, $eParams));
+        $this->userManager->logout();
         exit();
     }
 
@@ -339,6 +367,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
             exit;
         }
 
+        $this->userManager->login();
         if( !$this->isAuthenticated() )
         {
             echo $this->messageError(self::JSON_MESSAGE_USER_NOT_AUTHENTICATED);
@@ -348,6 +377,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
         $out = $this->newsfeedService->deleteFeedItem($actionId);
 
         echo json_encode($out);
+        $this->userManager->logout();
         exit();
     }
 
@@ -360,6 +390,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
             exit;
         }
 
+        $this->userManager->login();
         if( !$this->isAuthenticated() )
         {
             echo $this->messageError(self::JSON_MESSAGE_USER_NOT_AUTHENTICATED);
@@ -380,6 +411,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
         $out = $this->newsfeedService->flagContent($entityType, $entityId, $userId, $reason);
 
         echo json_encode($out);
+        $this->userManager->logout();
         exit();
     }
 
@@ -392,6 +424,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
             exit();
         }
 
+        $this->userManager->login();
         if( !$this->isAuthenticated() )
         {
             echo $this->messageError(self::JSON_MESSAGE_USER_NOT_AUTHENTICATED);
@@ -404,6 +437,45 @@ class EXTFEED_CTRL_Api extends OW_ActionController
         $out = $this->newsfeedService->getLikeList($entityType, $entityId);
 
         echo json_encode($out);
+        $this->userManager->logout();
+        exit();
+    }
+
+    public function getLinkContent()
+    {
+        $this->setHeaders();
+
+        $this->userManager->login();
+        if( !$this->isAuthenticated() )
+        {
+            echo $this->messageError(self::JSON_MESSAGE_USER_NOT_AUTHENTICATED);
+            exit();
+        }
+
+
+        $url = $_REQUEST['url'];
+
+        $out = $this->newsfeedService->analyzeLink($url);
+
+        if( empty($out) )
+        {
+            $out['type'] = 'empty';
+        }
+        if( isset($out['allImages']) )
+        {
+            $images = $out['allImages'];
+            $allImages = array();
+
+            foreach( $images as $link )
+            {
+                $url = EXTFEED_CLASS_Utils::getInstance()->sanitizeUrl($link);
+                $allImages[] = $url;
+            }
+
+            $out['allImages'] = $allImages;
+        }
+        echo json_encode($out);
+        $this->userManager->logout();
         exit();
     }
 

@@ -6,6 +6,9 @@ class EXTFEED_EXTRACTOR_Image extends EXTFEED_CLASS_PostExtractor
     public function extractContent($data)
     {
         $dataContent = $data['content'];
+        $imageUrl = $dataContent['vars']['image'];
+
+        $imageUrl = EXTFEED_CLASS_Utils::getInstance()->sanitizeUrl($imageUrl);
 
         if( OW::getPluginManager()->isPluginActive("photo") && !array_key_exists("attachmentId", $data['dataExtras']) )
         {
@@ -15,7 +18,7 @@ class EXTFEED_EXTRACTOR_Image extends EXTFEED_CLASS_PostExtractor
              */
             $photoService = PHOTO_BOL_PhotoService::getInstance();
             $photo = $photoService->findPhotoById($photoId);
-            $photoPreviewUrl = $dataContent['vars']['image'];
+            //$photoPreviewUrl = $dataContent['vars']['image'];
 
             $photoPreviewDimension = json_decode($photo->getDimension(), true);
 
@@ -24,12 +27,12 @@ class EXTFEED_EXTRACTOR_Image extends EXTFEED_CLASS_PostExtractor
                 'photoId' => $photoId,
                 'photoDescription' => $photo->description,
                 'photoPreviewDimensions' => $photoPreviewDimension[PHOTO_BOL_PhotoService::TYPE_PREVIEW],
-                'photoPreviewUrl' => $photoPreviewUrl
+                'photoPreviewUrl' => $imageUrl //prewiew image url
             );
         }
         else //if photo plugin is not active, images are stored as attachment
         {
-            $imageUrl = $dataContent['vars']['image'];
+            //$imageUrl = $dataContent['vars']['image'];
             $status = $this->findStatus($data);
             list($width, $height) = getimagesize($imageUrl);
 

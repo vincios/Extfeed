@@ -32,7 +32,12 @@ class EXTFEED_CLASS_EventHandler
 
     public function findDatalet( OW_Event $event )
     {
-        $eventData = $event->getData();
+        if( !OW::getPluginManager()->isPluginActive("ode") )
+        {
+            return;
+        }
+
+        $eventData = $event->getParams();
 
         /** @var NEWSFEED_CLASS_Action $action */
         $action = $eventData['action'];

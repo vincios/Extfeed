@@ -84,11 +84,11 @@ class EXTFEED_CLASS_NewsfeedService
 
         foreach ( $actionsList as $action )
         {
-            $data = array(
+            $param = array(
                 'action'=>$action
             );
 
-            $event = new OW_Event("extfeed.before_post_extraction", array(), $data);
+            $event = new OW_Event("extfeed.before_post_extraction", $param);
             $event = OW::getEventManager()->trigger($event);
 
             $data = $event->getData();
@@ -170,7 +170,7 @@ class EXTFEED_CLASS_NewsfeedService
         $content = array();
         $attachmentId = null;
 
-        if($attachment !== null)
+        if($attachment !== null && is_array($attachment) ) //Attachment is a file
         {
             $type = explode("/", $attachment['type']);
 
@@ -193,6 +193,10 @@ class EXTFEED_CLASS_NewsfeedService
                     );
                 }
             }
+        }
+        else if( $attachment !== null )
+        {
+            $content = json_decode($attachment, true);
         }
 
         $event = new OW_Event("feed.before_content_add", array(
@@ -262,10 +266,7 @@ class EXTFEED_CLASS_NewsfeedService
 
         $event = new OW_Event(
             "extfeed.before_post_extraction",
-            array(),
-            array(
-                'action'=>$action
-            )
+            array('action'=>$action)
         );
 
         OW::getEventManager()->trigger($event);
@@ -308,7 +309,7 @@ class EXTFEED_CLASS_NewsfeedService
             $createActivities = $this->bolService->findActivity(NEWSFEED_BOL_Service::SYSTEM_ACTIVITY_CREATE . ':' . $action->id);
 
             /**@var $activity NEWSFEED_BOL_Activity */
-            foreach ( $createActivities as $activity)
+            foreach ( $createActivities as $activity )
             {
                 if( $activity->userId == $this->userManager->getUserId() )
                 {
@@ -392,6 +393,13 @@ class EXTFEED_CLASS_NewsfeedService
         return $out;
     }
 
+    public function analyzeLink( $url )
+    {
+        $url = EXTFEED_CLASS_Utils::getInstance()->sanitizeUrl($url);
+        $url = $url = str_replace("'", '%27', $url);
+
+        return UTIL_HttpResource::getOEmbed($url);
+    }
 
     /**
      * Construct an appropriate driver for the feed.

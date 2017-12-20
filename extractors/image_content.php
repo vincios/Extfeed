@@ -18,8 +18,14 @@ class EXTFEED_EXTRACTOR_ImageContent extends EXTFEED_CLASS_PostExtractor
                 }
                 else
                 {
-                    $outContent['url'] = $value;
+                    $url = EXTFEED_CLASS_Utils::getInstance()->sanitizeUrl($value);
+                    $outContent['url'] = $url;
                 }
+            }
+            else if( $key == 'image' || $key == 'thumbnail')
+            {
+                $url = EXTFEED_CLASS_Utils::getInstance()->sanitizeUrl($value);
+                $outContent[$key] = $url;
             }
             else
             {
