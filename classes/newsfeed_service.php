@@ -92,8 +92,7 @@ class EXTFEED_CLASS_NewsfeedService
             $event = OW::getEventManager()->trigger($event);
 
             $data = $event->getData();
-            //$actionOut = isset($data['actionOut']) ? $data['actionOut'] : $action;
-            $action = $data['action'];
+            $action = isset($data['action']) ? $data['action'] : $action;
 
             /**@var EXTFEED_CLASS_PostExtractor $extractor */
             $extractor = EXTFEED_CLASS_ExtractorsManager::getInstance()->getExtractor($action->getFormat());
@@ -481,21 +480,21 @@ class EXTFEED_CLASS_NewsfeedService
                         OW::getEventManager()->trigger( $event );
                     }
                     catch
-                    (RedirectException $e )
+                    ( RedirectException $e )
                     {
                         $auth['view']['result'] = false;
                         $data = $e->getData();
                         $auth['view']['message'] = isset($data['message']) ? $data['message'] : "No permissions";
                     }
                 }
-                $isBlocked = BOL_UserService::getInstance()->isBlocked($this->userManager->getUserId(), $userId);
+                $isBlocked = BOL_UserService::getInstance()->isBlocked($viewerId, $userId);
 
                 if( $this->userManager->isAuthorized('base', 'add_comment') )
                 {
                     if( $isBlocked )
                     {
-                        $auth['write']['result'] = false;
-                        $auth['write']['message'] = OW::getLanguage()->text("base", "user_block_message");
+                        $auth['write']['result'] = $auth['view']['result'] = false;
+                        $auth['write']['message'] = $auth['view']['message'] = OW::getLanguage()->text("base", "user_block_message");
                     }
                 } else
                 {
@@ -526,7 +525,7 @@ class EXTFEED_CLASS_NewsfeedService
                 }
                 break;
             case "site":
-                $enabled = OW::getConfig()->getValue('newsfeed', 'index_status_enabled');
+                $enabled = OW::getConfig()->getValue('newsfeed', 'index_status_enabled') == 'on';
 
                 if ( !$enabled || !$this->userManager->isAuthenticated() || !$this->userManager->isAuthorized('newsfeed', 'allow_status_update') )
                 {

@@ -56,6 +56,11 @@ class EXTFEED_CLASS_EventHandler
 
     public function addDataletOnComment( OW_Event $e )
     {
+        if( !OW::getPluginManager()->isPluginActive("ode") )
+        {
+            return;
+        }
+
         $params = $e->getParams();
         $data = $e->getData();
 

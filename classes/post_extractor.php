@@ -250,7 +250,7 @@ abstract class EXTFEED_CLASS_PostExtractor
             return $routeParams;
         }
 
-        return OW::getRouter()->urlForRoute( $routeParams['routeName'], $routeParams['vars']);
+        return OW::getRouter()->urlForRoute( $routeParams['routeName'], $routeParams['vars'] );
     }
 
 
@@ -307,7 +307,7 @@ abstract class EXTFEED_CLASS_PostExtractor
 
             if ( $authAction === null )
             {
-                $authGroup = "newsfeed"; //...if not we use the generic authorization rules for the plugin 'newsfeed'
+                $authGroup = "newsfeed"; //...if not we use the generic authorization rule for the plugin 'newsfeed'
             }
 
             $isAllowed = EXTFEED_CLASS_UserManager::getInstance()->isAuthorized($authGroup, "add_comment");

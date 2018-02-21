@@ -49,7 +49,13 @@ class EXTFEED_CLASS_UserManager
     public function getUserId()
     {
         $user_id = null;
-        if ( !OW::getUser()->isAuthenticated() )
+
+        if( OW::getUser()->isAuthenticated() )
+        {
+            return OW::getUser()->getId();
+        }
+
+        if( OW::getPluginManager()->isPluginActive("ode") )
         {
             try
             {
@@ -62,7 +68,7 @@ class EXTFEED_CLASS_UserManager
             }
         }else
         {
-            $user_id = OW::getUser()->getId();
+            $user_id = null;
         }
 
         return $user_id;

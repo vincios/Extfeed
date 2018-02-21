@@ -20,7 +20,7 @@ class EXTFEED_CLASS_CommentsService
     /**
      * Returns class instance
      *
-     * @return EXTFEED_CLASS_UserManager
+     * @return EXTFEED_CLASS_CommentsService
      */
     public static function getInstance()
     {
@@ -53,6 +53,7 @@ class EXTFEED_CLASS_CommentsService
             $comments = BOL_CommentService::getInstance()->findFullCommentList($entityType, $entityId);
         }
 
+        $comments = array_reverse($comments);
         $out = array();
 
         /**@var $comment BOL_Comment*/
@@ -131,7 +132,6 @@ class EXTFEED_CLASS_CommentsService
     public function deleteComment( $commentId, $entityParams )
     {
         $commentService = BOL_CommentService::getInstance();
-
         /* @var $comment BOL_Comment */
         $comment = $commentService->findComment($commentId);
 
@@ -276,6 +276,11 @@ class EXTFEED_CLASS_CommentsService
         $eventData = $event->getData();
 
         $attachment = isset($eventData['attachment']) ? json_encode($eventData['attachment']) : $comment->getAttachment();
+
+        $attachmentDec = json_decode($attachment, true);
+        $attachmentDec = EXTFEED_CLASS_Utils::getInstance()->sanitizeUrl($attachmentDec);
+
+        $attachment = $attachmentDec === null ? $attachmentDec : json_encode($attachmentDec);
 
         $comment = array(
             'id' => $comment->getId(),

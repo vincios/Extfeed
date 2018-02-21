@@ -12,9 +12,11 @@ class EXTFEED_CTRL_Api extends OW_ActionController
     /** @var EXTFEED_CLASS_PhotoService */
     protected $photoService;
 
-    protected $userManager;
+    protected $usersService;
 
     const JSON_RESULT_FIELD = "result";
+
+    protected $userManager;
     const JSON_MESSAGE_FIELD = "message";
     const JSON_MESSAGE_MISSING_PARAMETER = "Missing required parameters";
     const JSON_MESSAGE_USER_NOT_AUTHENTICATED = "User must be authenticated";
@@ -25,6 +27,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
         $this->newsfeedService = EXTFEED_CLASS_NewsfeedService::getInstance();
         $this->commentsService = EXTFEED_CLASS_CommentsService::getInstance();
         $this->photoService = EXTFEED_CLASS_PhotoService::getInstance();
+        $this->usersService = EXTFEED_CLASS_UsersService::getInstance();
         $this->userManager = EXTFEED_CLASS_UserManager::getInstance();
     }
 
@@ -36,7 +39,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
 
     private function isAuthenticated()
     {
-       return $this->userManager->isAuthenticated();
+        return $this->userManager->isAuthenticated();
     }
 
     private function messageError( $message )
@@ -464,15 +467,7 @@ class EXTFEED_CTRL_Api extends OW_ActionController
         if( isset($out['allImages']) )
         {
             $images = $out['allImages'];
-            $allImages = array();
-
-            foreach( $images as $link )
-            {
-                $url = EXTFEED_CLASS_Utils::getInstance()->sanitizeUrl($link);
-                $allImages[] = $url;
-            }
-
-            $out['allImages'] = $allImages;
+            $out['allImages'] = EXTFEED_CLASS_Utils::getInstance()->sanitizeUrl($images);
         }
         echo json_encode($out);
         $this->userManager->logout();
@@ -493,6 +488,28 @@ class EXTFEED_CTRL_Api extends OW_ActionController
         return true;
     }
 
+    public function getUserProfileInfo()
+    {
+        $this->setHeaders();
+        if ( !$this->paramsExists(array('userId')) )
+        {
+            echo $this->messageError(self::JSON_MESSAGE_MISSING_PARAMETER);
+            exit;
+        }
+
+        $this->userManager->login();
+        if( !$this->isAuthenticated() )
+        {
+            echo $this->messageError(self::JSON_MESSAGE_USER_NOT_AUTHENTICATED);
+            exit();
+        }
+
+        $userId = $_REQUEST['userId'];
+        $out = $this->usersService->getUserProfileInfo($userId);
+        echo json_encode($out);
+        exit();
+    }
+
     public function photosInfo()
     {
         $this->setHeaders();
@@ -507,5 +524,6 @@ class EXTFEED_CTRL_Api extends OW_ActionController
         echo json_encode($out);
         exit;
     }
+
 
 }
